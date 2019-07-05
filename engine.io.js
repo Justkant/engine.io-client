@@ -52,7 +52,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -66,9 +66,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	module.exports.parser = __webpack_require__(8);
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -190,6 +190,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.pingIntervalTimer = null;
 	  this.pingTimeoutTimer = null;
 
+	  this.setTimeout = opts.setTimeout || setTimeout;
+	  this.clearTimeout = opts.clearTimeout || clearTimeout;
+
 	  this.open();
 	}
 
@@ -271,7 +274,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    localAddress: options.localAddress || this.localAddress,
 	    requestTimeout: options.requestTimeout || this.requestTimeout,
 	    protocols: options.protocols || void 0,
-	    isReactNative: this.isReactNative
+	    isReactNative: this.isReactNative,
+	    setTimeout: this.setTimeout
 	  });
 
 	  return transport;
@@ -299,7 +303,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else if (0 === this.transports.length) {
 	    // Emit error on next tick so it can be listened to
 	    var self = this;
-	    setTimeout(function () {
+	    this.setTimeout(function () {
 	      self.emit('error', 'No transports available');
 	    }, 0);
 	    return;
@@ -563,9 +567,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 
 	Socket.prototype.onHeartbeat = function (timeout) {
-	  clearTimeout(this.pingTimeoutTimer);
+	  this.clearTimeout(this.pingTimeoutTimer);
 	  var self = this;
-	  self.pingTimeoutTimer = setTimeout(function () {
+	  self.pingTimeoutTimer = this.setTimeout(function () {
 	    if ('closed' === self.readyState) return;
 	    self.onClose('ping timeout');
 	  }, timeout || self.pingInterval + self.pingTimeout);
@@ -580,8 +584,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Socket.prototype.setPing = function () {
 	  var self = this;
-	  clearTimeout(self.pingIntervalTimer);
-	  self.pingIntervalTimer = setTimeout(function () {
+	  this.clearTimeout(self.pingIntervalTimer);
+	  self.pingIntervalTimer = this.setTimeout(function () {
 	    debug('writing ping packet - expecting pong within %sms', self.pingTimeout);
 	    self.ping();
 	    self.onHeartbeat(self.pingTimeout);
@@ -766,8 +770,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var self = this;
 
 	    // clear timers
-	    clearTimeout(this.pingIntervalTimer);
-	    clearTimeout(this.pingTimeoutTimer);
+	    this.clearTimeout(this.pingIntervalTimer);
+	    this.clearTimeout(this.pingTimeoutTimer);
 
 	    // stop event from firing again for transport
 	    this.transport.removeAllListeners('close');
@@ -810,9 +814,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return filteredUpgrades;
 	};
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -870,9 +874,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -914,9 +918,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	
 	/**
@@ -937,9 +941,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -979,6 +983,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Polling.call(this, opts);
 	  this.requestTimeout = opts.requestTimeout;
 	  this.extraHeaders = opts.extraHeaders;
+
+	  this.setTimeout = opts.setTimeout || setTimeout;
 
 	  if (typeof location !== 'undefined') {
 	    var isSSL = 'https:' === location.protocol;
@@ -1198,7 +1204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	          // make sure the `error` event handler that's user-set
 	          // does not throw in the same tick and gets caught here
-	          setTimeout(function () {
+	          this.setTimeout(function () {
 	            self.onError(xhr.status);
 	          }, 0);
 	        }
@@ -1211,7 +1217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Need to defer since .create() is called directly fhrom the constructor
 	    // and thus the 'error' event can only be only bound *after* this exception
 	    // occurs.  Therefore, also, we cannot throw here at all.
-	    setTimeout(function () {
+	    this.setTimeout(function () {
 	      self.onError(e);
 	    }, 0);
 	    return;
@@ -1358,9 +1364,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1609,9 +1615,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return schema + '://' + (ipv6 ? '[' + this.hostname + ']' : this.hostname) + port + this.path + query;
 	};
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1776,9 +1782,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.emit('close');
 	};
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
@@ -2387,9 +2393,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	
 	/**
@@ -2412,9 +2418,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* global Blob File */
 
@@ -2482,9 +2488,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	var toString = {}.toString;
 
@@ -2493,9 +2499,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * An abstraction for slicing an arraybuffer even when
@@ -2528,9 +2534,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ },
+/***/ }),
 /* 13 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = after
 
@@ -2562,9 +2568,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function noop() {}
 
 
-/***/ },
+/***/ }),
 /* 14 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/*! https://mths.be/utf8js v2.1.2 by @mathias */
 
@@ -2778,9 +2784,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ },
+/***/ }),
 /* 15 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/*
 	 * base64-arraybuffer
@@ -2851,9 +2857,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 
-/***/ },
+/***/ }),
 /* 16 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * Create a blob builder even when vendor prefixes exist
@@ -2957,9 +2963,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 
-/***/ },
+/***/ }),
 /* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	
 	/**
@@ -3126,9 +3132,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ },
+/***/ }),
 /* 18 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * Compiles a querystring
@@ -3169,9 +3175,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ },
+/***/ }),
 /* 19 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	
 	module.exports = function(a, b){
@@ -3181,9 +3187,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  a.prototype.constructor = a;
 	};
 
-/***/ },
+/***/ }),
 /* 20 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -3255,9 +3261,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = yeast;
 
 
-/***/ },
+/***/ }),
 /* 21 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
 	 * This is the web browser implementation of `debug()`.
@@ -3457,9 +3463,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
-/***/ },
+/***/ }),
 /* 22 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	// shim for using process in browser
 	var process = module.exports = {};
@@ -3647,9 +3653,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	process.umask = function() { return 0; };
 
 
-/***/ },
+/***/ }),
 /* 23 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	
 	/**
@@ -3878,9 +3884,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 24 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * Helpers.
@@ -4036,9 +4042,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 25 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 
@@ -4092,6 +4098,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Polling.call(this, opts);
 
 	  this.query = this.query || {};
+
+	  this.setTimeout = opts.setTimeout || setTimeout;
 
 	  // define global callbacks array if not present
 	  // we do this here (lazily) to avoid unneeded global pollution
@@ -4186,7 +4194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var isUAgecko = 'undefined' !== typeof navigator && /gecko/i.test(navigator.userAgent);
 
 	  if (isUAgecko) {
-	    setTimeout(function () {
+	    this.setTimeout(function () {
 	      var iframe = document.createElement('iframe');
 	      document.body.appendChild(iframe);
 	      document.body.removeChild(iframe);
@@ -4281,9 +4289,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ },
+/***/ }),
 /* 26 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -4342,6 +4350,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!this.usingBrowserWebSocket) {
 	    WebSocketImpl = NodeWebSocket;
 	  }
+
+	  this.setTimeout = opts.setTimeout || setTimeout;
+
 	  Transport.call(this, opts);
 	}
 
@@ -4498,7 +4509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // fake drain
 	    // defer to next tick to allow Socket to clear writeBuffer
-	    setTimeout(function () {
+	    this.setTimeout(function () {
 	      self.writable = true;
 	      self.emit('drain');
 	    }, 0);
@@ -4575,15 +4586,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return !!WebSocketImpl && !('__initialize' in WebSocketImpl && this.name === WS.prototype.name);
 	};
 
-/***/ },
+/***/ }),
 /* 27 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/* (ignored) */
 
-/***/ },
+/***/ }),
 /* 28 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	
 	var indexOf = [].indexOf;
@@ -4596,9 +4607,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return -1;
 	};
 
-/***/ },
+/***/ }),
 /* 29 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * Parses an URI
@@ -4641,7 +4652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;
